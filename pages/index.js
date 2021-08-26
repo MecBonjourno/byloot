@@ -3,8 +3,9 @@ import Head from 'next/head';
 import Image from 'next/image';
 import styles from '../styles/Home.module.css';
 import { Canvas, useFrame } from '@react-three/fiber';
-import { OrbitControls, Html, useGLTF } from '@react-three/drei';
+import { OrbitControls, Html, useGLTF, useProgress } from '@react-three/drei';
 import { useInView } from 'react-intersection-observer';
+import { a, useTransition } from '@react-spring/web';
 
 function Box() {
   return (
@@ -43,19 +44,39 @@ const HTMLContent = ({ domContent, children, bgColor, modelPath, position }) => 
   );
 };
 
+function Loader() {
+  const { active, progress } = useProgress();
+  const transition = useTransition(active, {
+    from: { opacity: 1, progress: 0 },
+    leave: { opacity: 0 },
+    update: { progress },
+  });
+  return transition(
+    ({ progress, opacity }, active) =>
+      active && (
+        <a.div className="loading" style={{ opacity }}>
+          <div className="loading-bar-container">
+            <a.div className="loading-bar" style={{ width: progress }}></a.div>
+          </div>
+        </a.div>
+      )
+  );
+}
+
 export default function Home() {
   const domContent = useRef();
 
   return (
     <div className={styles.container}>
       <Head>
-        <title>ByLoot</title>
+        <title>byLoot</title>
         <meta name="description" content="ByLoot Store" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
+      <Loader />
 
       <main className={styles.main}>
-        <h1 className={styles.title}>ByLoot</h1>
+        <h1 className={styles.title}>byLoot</h1>
         <p>Coming Soon</p>
         <Canvas>
           <Suspense fallback={null}>
